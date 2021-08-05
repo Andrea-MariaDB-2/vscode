@@ -81,6 +81,8 @@ export const NOTEBOOK_EDITOR_WIDGET_ACTION_WEIGHT = KeybindingWeight.EditorContr
 
 export const enum CellToolbarOrder {
 	EditCell,
+	ExecuteAboveCells,
+	ExecuteCellAndBelow,
 	SplitCell,
 	SaveCell,
 	ClearCellOutput
@@ -420,7 +422,8 @@ registerAction2(class ExecuteAboveCells extends NotebookMultiCellAction<INoteboo
 				},
 				{
 					id: MenuId.NotebookCellTitle,
-					group: 'inline',
+					order: CellToolbarOrder.ExecuteAboveCells,
+					group: CELL_TITLE_CELL_GROUP_ID,
 					when: ContextKeyExpr.and(
 						executeCellCondition,
 						ContextKeyExpr.equals('config.notebook.consolidatedRunButton', false))
@@ -463,7 +466,8 @@ registerAction2(class ExecuteCellAndBelow extends NotebookMultiCellAction<INoteb
 				},
 				{
 					id: MenuId.NotebookCellTitle,
-					group: 'inline',
+					order: CellToolbarOrder.ExecuteCellAndBelow,
+					group: CELL_TITLE_CELL_GROUP_ID,
 					when: ContextKeyExpr.and(
 						executeCellCondition,
 						ContextKeyExpr.equals('config.notebook.consolidatedRunButton', false))
@@ -1016,6 +1020,10 @@ abstract class InsertCellCommand extends NotebookAction {
 
 	async runWithContext(accessor: ServicesAccessor, context: INotebookActionContext): Promise<void> {
 		let newCell: CellViewModel | null = null;
+		if (context.ui) {
+			context.notebookEditor.focus();
+		}
+
 		if (context.cell) {
 			newCell = context.notebookEditor.insertNotebookCell(context.cell, this.kind, this.direction, undefined, true);
 		} else {
@@ -1890,6 +1898,7 @@ registerAction2(class NotebookConfigureLayoutAction extends Action2 {
 			id: 'workbench.notebook.layout.select',
 			title: localize('workbench.notebook.layout.select.label', "Select between Notebook Layouts"),
 			f1: true,
+			precondition: ContextKeyExpr.equals(`config.${OpenGettingStarted}`, true),
 			category: NOTEBOOK_ACTIONS_CATEGORY,
 			menu: [
 				{
@@ -1946,7 +1955,7 @@ registerAction2(class NotebookConfigureLayoutAction extends Action2 {
 		});
 	}
 	run(accessor: ServicesAccessor): void {
-		accessor.get(IPreferencesService).openSettings(false, '@tag:notebookLayout');
+		accessor.get(IPreferencesService).openSettings({ jsonEditor: false, query: '@tag:notebookLayout' });
 	}
 });
 

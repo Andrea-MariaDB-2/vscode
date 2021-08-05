@@ -386,35 +386,9 @@ export interface IShellLaunchConfig {
 	color?: string;
 }
 
-export interface ICreateTerminalOptions {
-	/**
-	 * The shell launch config or profile to launch with, when not specified the default terminal
-	 * profile will be used.
-	 */
-	config?: IShellLaunchConfig | ITerminalProfile | IExtensionTerminalProfile;
-	/**
-	 * The current working directory to start with, this will override IShellLaunchConfig.cwd if
-	 * specified.
-	 */
-	cwd?: string | URI;
-	/**
-	 * Where to create the terminal, when not specified the default target will be used.
-	 */
-	target?: TerminalLocation;
-	/**
-	 * Creates a split terminal without requiring a terminal instance to split, for example when splitting
-	 * a terminal editor
-	 */
-	forceSplit?: boolean;
-	/**
-	 * The terminal's resource, passed when the terminal has moved windows.
-	 */
-	resource?: URI;
-}
-
 export interface ICreateContributedTerminalProfileOptions {
 	target?: TerminalLocation;
-	icon?: string;
+	icon?: URI | string | { light: URI, dark: URI };
 	color?: string;
 	isSplitTerminal?: boolean;
 }
@@ -623,7 +597,7 @@ export interface ITerminalContributions {
 export interface ITerminalProfileContribution {
 	title: string;
 	id: string;
-	icon?: string;
+	icon?: URI | { light: URI, dark: URI } | string;
 	color?: string;
 }
 
